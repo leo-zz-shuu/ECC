@@ -14,7 +14,8 @@
 # https://developers.openai.com/codex/config-reference
 # https://developers.openai.com/codex/multi-agent
 
-# Leave top-level model and model_provider unset to inherit other/default choices.
+# Leave model, model_reasoning_effort, and model_provider unset so the active
+# Codex session's selected model and provider remain in use.
 # Existing ECC instruction key retained for sync compatibility, without claiming
 # support in every Codex version. Consult the supported version's reference.
 persistent_instructions = "Follow project AGENTS.md guidelines. Use available MCP servers when they can help."

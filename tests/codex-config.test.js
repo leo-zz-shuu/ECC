@@ -52,8 +52,10 @@ let passed = 0;
 let failed = 0;
 
 if (
-  test('reference config does not pin a top-level model', () => {
-    assert.ok(!/^model\s*=/m.test(config), 'Expected `.codex/config.toml` to inherit the CLI default model');
+  test('project config inherits the active session model and provider', () => {
+    assert.ok(!/^model\s*=/m.test(config));
+    assert.ok(!/^model_reasoning_effort\s*=/m.test(config));
+    assert.ok(!/^model_provider\s*=/m.test(config));
   })
 )
   passed++;
@@ -76,6 +78,23 @@ if (
       /^\s*multi_agent\s*=\s*true\s*$/m.test(config),
       'Expected `.codex/config.toml` to opt into Codex multi-agent collaboration',
     );
+  })
+)
+  passed++;
+else failed++;
+
+if (
+  test('project guidance defines deterministic dispatch through configured Claude CLI', () => {
+    const guidance = fs.readFileSync(path.join(repoRoot, '.codex', 'AGENTS.md'), 'utf8');
+    const dispatcher = path.join(repoRoot, 'scripts', 'model-worker.js');
+    assert.ok(fs.existsSync(dispatcher));
+    assert.match(guidance, /model selected by the active session/i);
+    assert.match(guidance, /deterministic/i);
+    assert.match(guidance, /model-worker\.js/);
+    assert.match(guidance, /ANTHROPIC_BASE_URL/);
+    assert.match(guidance, /ANTHROPIC_AUTH_TOKEN/);
+    assert.match(guidance, /ANTHROPIC_MODEL/);
+    assert.match(guidance, /claude CLI/i);
   })
 )
   passed++;
@@ -156,7 +175,9 @@ function withMergeFixture(fn) {
 const checks = [
   ['project config has only the intended guidance, feature and role keys', () => {
     const project = TOML.parse(config);
-    assert.deepStrictEqual(Object.keys(project).sort(), ['agents', 'features', 'persistent_instructions']);
+    assert.deepStrictEqual(Object.keys(project).sort(), [
+      'agents', 'features', 'persistent_instructions',
+    ]);
     assert.deepStrictEqual(project.features, { multi_agent: true });
     assert.strictEqual(project.persistent_instructions,
       'Follow project AGENTS.md guidelines. Use available MCP servers when they can help.');

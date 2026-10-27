@@ -158,6 +158,7 @@
     "scripts/loop-status.js",
     "scripts/plan-canvas.js",
     "scripts/orchestration-status.js",
+    "scripts/model-worker.js",
     "scripts/orchestrate-codex-worker.sh",
     "scripts/orchestrate-worktrees.js",
     "scripts/repair.js",
